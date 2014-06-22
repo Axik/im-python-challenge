@@ -8,6 +8,7 @@ urlpatterns = patterns(
     'common.views',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^profile/', include('profiles.urls', 'profiles')),
+    url(r'^compute/gaussian_distribution/', include('vehicle.urls', 'vehicle')),
     url(r'^$', 'main', name='main'),
 )
 
