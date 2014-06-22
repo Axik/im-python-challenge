@@ -15,21 +15,23 @@ _requirements:
 
 req: _requirements
 
-db: dropdb createdb syncdb migrate loaddata
+db: syncdb migrate
+
+newdb: dropdb createdb loaddata syncdb migrate
 
 createdb:
-	@echo "Creating PostgreSQL database $(DB_NAME)"
+	@echo "Creating MySQL database $(DB_NAME)"
 	@make -i _createdb >> /dev/null
 
 _createdb:
-	@createdb $(DB_NAME)
+	@mysqladmin create $(DB_NAME)
 
 dropdb:
-	@echo "Destroying PostgreSQL database $(DB_NAME)"
+	@echo "Destroying MySQL database $(DB_NAME)"
 	@make -i _dropdb >> /dev/null
 
 _dropdb:
-	@dropdb $(DB_NAME)
+	@mysqladmin drop $(DB_NAME) --force
 
 migrate:
 	@echo "Running migrations"
@@ -40,6 +42,8 @@ syncdb:
 	@python manage.py syncdb --noinput -v 0
 
 loaddata:
+	@echo "Loading sql dump"
+	@mysql -h localhost -u kperevozchikov $(DB_NAME) < ../vehicle_prospects.sql
 	@echo "Loading additional data fixtures"
 	@python manage.py filldb
 
@@ -53,7 +57,7 @@ test:
 	@python manage.py test $(APPS)
 
 shell:
-	@python manage.py shell
+	@python manage.py shell_plus
 
 end:
 	@echo "You can now run development server using 'make run' command"
